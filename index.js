@@ -7,6 +7,17 @@ const PORT = 3003;
 app.use(express.json());
 
 
+app.get('/api/alumnos', (req, res) => {
+    const query = 'SELECT * FROM alumnos';
+    db.query(query, (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(results);
+    });
+});
+
+
 app.get('/api/profesores', (req, res) => {
     const query = 'SELECT * FROM profesores';
     db.query(query, (err, results) => {
@@ -28,6 +39,32 @@ app.get('/api/asignaturas', (req, res) => {
     });
 });
 
+
+app.get('/api/calificaciones', (req, res) => {
+    const query = 'SELECT * FROM calificaciones';
+    db.query(query, (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(results);
+    });
+});
+
+
+
+app.post('/api/alumnos', (req, res) => {
+    const { nombre, apellidos, email, matricula, edad, semestre, usuario_creacio, fecha_creacion } = req.body;
+    const query = `
+        INSERT INTO alumnos (nombre, apellidos, email, matricula, edad, semestre, usuario_creacio, fecha_creacion)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    db.query(query, [nombre, apellidos, email, matricula, edad, semestre, usuario_creacio, fecha_creacion], (err, result) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json({ mensaje: 'Dato insertado exitosamente', id: result.insertId });
+    });
+});
 
 app.post('/api/profesores', (req, res) => {
     const { nombre, edad, telefono, correo, usuario_creacio, fecha_creacion } = req.body;
@@ -57,6 +94,19 @@ app.post('/api/asignaturas', (req, res) => {
     });
 });
 
+app.post('/api/calificaciones', (req, res) => {
+    const { estudiante_id, maestro_id, materia_id, create_user, create_date } = req.body;
+    const query = `
+        INSERT INTO calificaciones (estudiante_id, maestro_id, materia_id, create_user, create_date)
+        VALUES (?, ?, ?, ?, ?)
+    `;
+    db.query(query, [estudiante_id, maestro_id, materia_id, create_user, create_date], (err, result) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json({ mensaje: 'Dato insertado exitosamente', id: result.insertId });
+    });
+});
 
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);
